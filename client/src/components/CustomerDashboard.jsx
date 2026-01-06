@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 const CustomerDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [services, setServices] = useState([]);
-  const [selectedService, setSelectedService] = useState("");
+  const [serviceId, setServiceId] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
 
@@ -14,38 +14,38 @@ const CustomerDashboard = () => {
   }, []);
 
   const fetchAppointments = async () => {
-    try {
-      const response = await axios.get("/appointments/my");
-      setAppointments(response.data);
-    } catch (err) {
-      console.error("Failed to fetch appointments:", err);
-    }
+    const { data } = await axios.get("/appointments/my");
+    setAppointments(data);
   };
 
   const fetchServices = async () => {
-    try {
-      const response = await axios.get("/services");
-      setServices(response.data);
-    } catch (err) {
-      console.error("Failed to fetch services:", err);
-    }
+    const { data } = await axios.get("/services");
+    setServices(data);
   };
 
-  const handleBookAppointment = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!serviceId || !date || !time) {
+      alert("All fields are required");
+      return;
+    }
+
     try {
       await axios.post("/appointments", {
-        serviceId: selectedService,
+        serviceId,
         date,
         time,
       });
-      fetchAppointments();
-      setSelectedService("");
+
+      await fetchAppointments();
+      setServiceId("");
       setDate("");
       setTime("");
-      alert("Appointment booked successfully!");
+      alert("Appointment booked");
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to book appointment");
+      console.error(err);
+      alert(err.response?.data?.message || "Server error");
     }
   };
 
@@ -54,90 +54,66 @@ const CustomerDashboard = () => {
       <h2 className="text-3xl font-bold mb-6">Customer Dashboard</h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Book Appointment Form */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-bold mb-4">Book New Appointment</h3>
-          <form onSubmit={handleBookAppointment} className="space-y-4">
-            <div>
-              <label className="block text-gray-700 mb-2">Service</label>
-              <select
-                value={selectedService}
-                onChange={(e) => setSelectedService(e.target.value)}
-                className="w-full px-3 py-2 border rounded"
-                required
-              >
-                <option value="">Select a service</option>
-                {services.map((service) => (
-                  <option key={service._id} value={service._id}>
-                    {service.name} (${service.price})
-                  </option>
-                ))}
-              </select>
-            </div>
+        {/* Book Appointment */}
+        <div className="bg-white p-6 rounded shadow">
+          <h3 className="text-xl font-bold mb-4">Book Appointment</h3>
 
-            <div>
-              <label className="block text-gray-700 mb-2">Date</label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 mb-2">Time</label>
-              <input
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <select
+              value={serviceId}
+              onChange={(e) => setServiceId(e.target.value)}
+              className="w-full border p-2 rounded"
+              required
             >
-              Book Appointment
+              <option value="">Select Service</option>
+              {services.map((service) => (
+                <option key={service._id} value={service._id}>
+                  {service.name}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full border p-2 rounded"
+              required
+            />
+
+            <input
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              className="w-full border p-2 rounded"
+              required
+            />
+
+            <button className="w-full bg-blue-500 text-white py-2 rounded">
+              Book
             </button>
           </form>
         </div>
 
-        {/* My Appointments */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        {/* Appointments */}
+        <div className="bg-white p-6 rounded shadow">
           <h3 className="text-xl font-bold mb-4">My Appointments</h3>
+
           {appointments.length === 0 ? (
-            <p className="text-gray-600">No appointments booked yet.</p>
+            <p>No appointments yet.</p>
           ) : (
-            <div className="space-y-4">
-              {appointments.map((appointment) => (
-                <div key={appointment._id} className="border p-4 rounded">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-bold">
-                        {services.find((s) => s._id === appointment.serviceId)
-                          ?.name || "Service"}
-                      </p>
-                      <p className="text-gray-600">
-                        {appointment.date} at {appointment.time}
-                      </p>
-                    </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        appointment.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {appointment.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            appointments.map((a) => (
+              <div key={a._id} className="border p-3 rounded mb-2">
+                <p className="font-bold">
+                  {services.find((s) => s._id === a.serviceId)?.name ||
+                    "Service"}
+                </p>
+                <p>
+                  {a.date} — {a.time}
+                </p>
+                <span className="text-sm">{a.status}</span>
+              </div>
+            ))
           )}
         </div>
       </div>
