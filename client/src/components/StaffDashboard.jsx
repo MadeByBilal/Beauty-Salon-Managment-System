@@ -43,8 +43,8 @@ const StaffDashboard = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6">Staff Dashboard</h2>
+    <div className="">
+      <h2 className="">Staff Dashboard</h2>
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="overflow-x-auto">
