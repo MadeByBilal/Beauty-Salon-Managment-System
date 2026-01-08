@@ -21,12 +21,19 @@ router.post("/", isAuth, async (req, res) => {
   res.json(appointment);
 });
 
+// GET /appointments/my/completed - Must come before /my to avoid route conflict
+router.get("/my/completed", isAuth, async (req, res) => {
+  const apps = await Appointment.find({
+    userId: req.user.id,
+    status: "completed",
+  });
+  res.json(apps);
+});
 // Customer dashboard
 router.get("/my", isAuth, async (req, res) => {
   const apps = await Appointment.find({ userId: req.user.id });
   res.json(apps);
 });
-
 // Staff dashboard
 router.get("/staff", isAuth, isStaff, async (req, res) => {
   const apps = await Appointment.find();

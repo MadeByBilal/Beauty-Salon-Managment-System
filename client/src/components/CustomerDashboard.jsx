@@ -3,6 +3,7 @@ import axios from "axios";
 
 const CustomerDashboard = () => {
   const [appointments, setAppointments] = useState([]);
+  const [completedAppointments, setCompletedAppointments] = useState([]);
   const [services, setServices] = useState([]);
   const [serviceId, setServiceId] = useState("");
   const [date, setDate] = useState("");
@@ -10,12 +11,34 @@ const CustomerDashboard = () => {
 
   useEffect(() => {
     fetchAppointments();
+    fetchCompletedAppointments();
     fetchServices();
-  }, []);
 
+    // Add this to check user ID
+    const checkUser = async () => {
+      try {
+        const { data } = await axios.get("/auth/me");
+        console.log("Current user ID:", data.id);
+      } catch (err) {
+        console.error("Failed to get user info:", err);
+      }
+    };
+    checkUser();
+  }, []);
   const fetchAppointments = async () => {
     const { data } = await axios.get("/appointments/my");
     setAppointments(data);
+  };
+  const fetchCompletedAppointments = async () => {
+    try {
+      const { data } = await axios.get("/appointments/my/completed");
+      console.log("Completed appointments data:", data);
+      setCompletedAppointments(data || []);
+    } catch (err) {
+      console.error("Error fetching completed appointments:", err);
+      console.error("Error response:", err.response?.data);
+      setCompletedAppointments([]);
+    }
   };
 
   const fetchServices = async () => {
@@ -37,7 +60,7 @@ const CustomerDashboard = () => {
         date,
         time,
       });
-
+      await fetchCompletedAppointments();
       await fetchAppointments();
       setServiceId("");
       setDate("");
@@ -50,10 +73,10 @@ const CustomerDashboard = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6">Customer Dashboard</h2>
+    <div>
+      <h2>Customer Dashboard</h2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div>
         {/* Book Appointment */}
         <div className="bg-white p-6 rounded shadow">
           <h3 className="text-xl font-bold mb-4">Book Appointment</h3>
@@ -67,6 +90,7 @@ const CustomerDashboard = () => {
             >
               <option value="">Select Service</option>
               {services.map((service) => (
+                //Here it was mapping the services to the options
                 <option key={service._id} value={service._id}>
                   {service.name}
                 </option>
@@ -96,24 +120,61 @@ const CustomerDashboard = () => {
         </div>
 
         {/* Appointments */}
-        <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-xl font-bold mb-4">My Appointments</h3>
+        <div>
+          <h3>My Appointments</h3>
 
           {appointments.length === 0 ? (
             <p>No appointments yet.</p>
           ) : (
             appointments.map((a) => (
-              <div key={a._id} className="border p-3 rounded mb-2">
-                <p className="font-bold">
-                  {services.find((s) => s._id === a.serviceId)?.name ||
-                    "Service"}
+              <div key={a._id}>
+                <p>
+                  {
+                    //Here it was finding a service with the name by there id
+                    services.find((s) => s._id === a.serviceId)?.name ||
+                      "Service"
+                  }{" "}
                 </p>
                 <p>
                   {a.date} — {a.time}
                 </p>
-                <span className="text-sm">{a.status}</span>
+                <span>{a.status}</span>
               </div>
             ))
+          )}
+        </div>
+        {/* Completed Appointments */}
+        <div>
+          <h3>My History</h3>
+          {completedAppointments.length === 0 ? (
+            <p>No history yet.</p>
+          ) : (
+            completedAppointments.map((a) => {
+              // Add debugging
+              console.log("Appointment serviceId:", a.serviceId);
+              console.log("Appointment serviceId type:", typeof a.serviceId);
+              console.log("Available services:", services);
+
+              const service = services.find((s) => {
+                console.log("Comparing:", s._id, "with", a.serviceId);
+                return (
+                  s._id === a.serviceId ||
+                  s._id.toString() === a.serviceId.toString()
+                );
+              });
+
+              console.log("Found service:", service);
+
+              return (
+                <div key={a._id}>
+                  <p>{service?.name || "Service"}</p>
+                  <p>
+                    {a.date} — {a.time}
+                  </p>
+                  <span>{a.status}</span>
+                </div>
+              );
+            })
           )}
         </div>
       </div>
