@@ -175,6 +175,20 @@ const CustomerDashboard = () => {
           </div>
         ))}
       </div>
+      {/* ---- COMPLETED HISTORY ---- */}
+      <div>
+        <h3>Services you can get here</h3>
+
+        {services.length === 0 && <p>No services yet.</p>}
+
+        {services.map((meriServices) => (
+          <div key={meriServices._id}>
+            <p>Name:{meriServices.name}</p>
+            <p>Price:{meriServices.price}</p>
+            <span>Duration: {meriServices.duration}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -25,35 +25,41 @@ router.post("/", isAuth, async (req, res) => {
 // GET /appointments/my/completed - Must come before /my to avoid route conflict
 router.get("/my/completed", isAuth, async (req, res) => {
   try {
-    // Convert userId to ObjectId - MongoDB stores it as ObjectId but JWT gives us a string
-    const userId = mongoose.Types.ObjectId.isValid(req.user.id)
-      ? new mongoose.Types.ObjectId(req.user.id)
-      : req.user.id;
+    let query = { status: "completed" };
 
-    const apps = await Appointment.find({
-      userId: userId,
-      status: "completed",
-    });
+    // If not admin, filter by userId
+    if (req.user.role !== "admin") {
+      let userId = req.user.id;
+      // Convert to ObjectId if it's a valid ObjectId string
+      if (mongoose.Types.ObjectId.isValid(userId)) {
+        userId = new mongoose.Types.ObjectId(userId);
+      }
+      query.userId = userId;
+    }
 
+    const apps = await Appointment.find(query);
     res.json(apps);
   } catch (error) {
     console.error("Error fetching completed appointments:", error);
     res.status(500).json({ message: "Error fetching completed appointments" });
   }
 });
-// Customer dashboard - Only show pending appointments
+// Customer dashboard - Only show pending appointments (all for admin)
 router.get("/my", isAuth, async (req, res) => {
   try {
-    // Convert userId to ObjectId - MongoDB stores it as ObjectId but JWT gives us a string
-    const userId = mongoose.Types.ObjectId.isValid(req.user.id)
-      ? new mongoose.Types.ObjectId(req.user.id)
-      : req.user.id;
+    let query = { status: "pending" };
 
-    const apps = await Appointment.find({
-      userId: userId,
-      status: "pending",
-    });
+    // If not admin, filter by userId
+    if (req.user.role !== "admin") {
+      let userId = req.user.id;
+      // Convert to ObjectId if it's a valid ObjectId string
+      if (mongoose.Types.ObjectId.isValid(userId)) {
+        userId = new mongoose.Types.ObjectId(userId);
+      }
+      query.userId = userId;
+    }
 
+    const apps = await Appointment.find(query);
     res.json(apps);
   } catch (error) {
     console.error("Error fetching appointments:", error);
@@ -74,12 +80,6 @@ router.put("/:id/status", isAuth, isStaff, async (req, res) => {
     { new: true } // Return the updated document
   );
   res.json(app);
-});
-
-// Admin dashboard
-router.get("/admin", isAuth, isAdmin, async (req, res) => {
-  const apps = await Appointment.find();
-  res.json(apps);
 });
 
 export default router;

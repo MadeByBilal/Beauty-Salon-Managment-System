@@ -1,0 +1,17 @@
+.status-pending {
+  padding: 4px 8px;
+  background-color: #ffc107;
+  color: #000;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-completed {
+  padding: 4px 8px;
+  background-color: #28a745;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}

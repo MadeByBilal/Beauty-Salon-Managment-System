@@ -30,4 +30,15 @@ router.post("/login", async (req, res) => {
   res.json({ token, role: user.role });
 });
 
+// Get staff users (admin only)
+router.get("/staff", async (req, res) => {
+  try {
+    const staffUsers = await User.find({ role: "staff" }).select("-password");
+    res.json(staffUsers);
+  } catch (error) {
+    console.error("Error fetching staff users:", error);
+    res.status(500).json({ message: "Error fetching staff users" });
+  }
+});
+
 export default router;

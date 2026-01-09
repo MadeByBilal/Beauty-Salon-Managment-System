@@ -4,6 +4,8 @@ import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
   const [services, setServices] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [staffUsers, setStaffUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -27,8 +29,47 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchAppointments = async () => {
+    try {
+      // Fetch pending appointments
+      const pendingRes = await axios.get("/appointments/my");
+      const pendingAppointments = pendingRes.data || [];
+
+      // Fetch completed appointments
+      const completedRes = await axios.get("/appointments/my/completed");
+      const completedAppointments = completedRes.data || [];
+
+      // Combine both arrays
+      const allAppointments = pendingAppointments.concat(completedAppointments);
+
+      setAppointments(allAppointments);
+    } catch (err) {
+      console.error("Failed to fetch appointments:", err);
+      setAppointments([]);
+    }
+  };
+
+  const fetchStaffUsers = async () => {
+    try {
+      const res = await axios.get("/auth/staff");
+      setStaffUsers(res.data || []);
+    } catch (err) {
+      console.error("Failed to fetch staff users:", err);
+      setStaffUsers([]);
+    }
+  };
+
+  const getServiceName = (serviceId) => {
+    const service = services.find(
+      (s) => s._id?.toString() === serviceId?.toString()
+    );
+    return service ? service.name : "Unknown Service";
+  };
+
   useEffect(() => {
     fetchServices();
+    fetchAppointments();
+    fetchStaffUsers();
   }, []);
 
   const resetForm = () => {
@@ -173,6 +214,76 @@ const AdminDashboard = () => {
                         Delete
                       </button>
                     </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </section>
+
+      {/* Appointments Section */}
+      <section className="ad-section">
+        <h3>All Appointments (Pending & Completed)</h3>
+        <div className="ad-list">
+          {appointments.length === 0 ? (
+            <div>No appointments found</div>
+          ) : (
+            <table className="services-table">
+              <thead>
+                <tr>
+                  <th>Service</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appointments.map((app) => (
+                  <tr key={app._id}>
+                    <td>{getServiceName(app.serviceId)}</td>
+                    <td>{app.date}</td>
+                    <td>{app.time}</td>
+                    <td>
+                      <span
+                        className={
+                          app.status === "completed"
+                            ? "status-completed"
+                            : "status-pending"
+                        }
+                      >
+                        {app.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </section>
+
+      {/* Staff Users Section */}
+      <section className="ad-section">
+        <h3>Staff Accounts</h3>
+        <div className="ad-list">
+          {staffUsers.length === 0 ? (
+            <div>No staff users found</div>
+          ) : (
+            <table className="services-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                {staffUsers.map((staff) => (
+                  <tr key={staff._id}>
+                    <td>{staff.name}</td>
+                    <td>{staff.email}</td>
+                    <td>{staff.role}</td>
                   </tr>
                 ))}
               </tbody>
