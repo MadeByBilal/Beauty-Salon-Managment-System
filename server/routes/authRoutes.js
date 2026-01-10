@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { isAuth, isAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -38,6 +39,28 @@ router.get("/staff", async (req, res) => {
   } catch (error) {
     console.error("Error fetching staff users:", error);
     res.status(500).json({ message: "Error fetching staff users" });
+  }
+});
+
+// Delete staff user (admin only)
+router.delete("/staff/:id", isAuth, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.role !== "staff") {
+      return res.status(400).json({ message: "Can only delete staff users" });
+    }
+
+    await User.findByIdAndDelete(id);
+    res.json({ message: "Staff user deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting staff user:", error);
+    res.status(500).json({ message: "Error deleting staff user" });
   }
 });
 

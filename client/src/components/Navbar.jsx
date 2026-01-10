@@ -47,12 +47,7 @@ const Navbar = ({ user, logout }) => {
                 >
                   Login
                 </Link>
-                <Link
-                  to="/register"
-                  className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded"
-                >
-                  Register
-                </Link>
+                <Link to="/register">Register</Link>
               </>
             )}
           </div>

@@ -59,6 +59,18 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteStaff = async (id) => {
+    if (!confirm("Are you sure you want to delete this staff member?")) return;
+    setError("");
+    try {
+      await axios.delete(`/auth/staff/${id}`);
+      setMessage("Staff member deleted successfully");
+      setStaffUsers((prev) => prev.filter((staff) => staff._id !== id));
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete staff member");
+    }
+  };
+
   const getServiceName = (serviceId) => {
     const service = services.find(
       (s) => s._id?.toString() === serviceId?.toString()
@@ -276,6 +288,7 @@ const AdminDashboard = () => {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Role</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -284,6 +297,14 @@ const AdminDashboard = () => {
                     <td>{staff.name}</td>
                     <td>{staff.email}</td>
                     <td>{staff.role}</td>
+                    <td className="row-actions">
+                      <button
+                        onClick={() => handleDeleteStaff(staff._id)}
+                        className="btn-sm btn-danger"
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
