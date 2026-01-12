@@ -1,56 +1,73 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "./Navbar.css";
 
 const Navbar = ({ user, logout }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
+    setIsOpen(false);
     navigate("/login");
   };
 
   return (
-    <nav className="bg-blue-600 text-white shadow-lg">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex justify-between items-center">
-          <Link to="/" className="text-xl font-bold">
-            Appointment System
-          </Link>
+    <nav className="navbar">
+      <div className="nav-container">
+        {/* Logo Section */}
+        <Link to="/" className="nav-logo" onClick={() => setIsOpen(false)}>
+          AURA
+        </Link>
 
-          <div className="flex items-center space-x-4">
-            {user ? (
-              <>
-                <Link
-                  to="/services"
-                  className="hover:bg-blue-700 px-3 py-2 rounded"
-                >
-                  Services
-                </Link>
-                <Link
-                  to="/dashboard"
-                  className="hover:bg-blue-700 px-3 py-2 rounded"
-                >
-                  Dashboard
-                </Link>
-                <span className="px-3 py-2">Welcome, {user.role}</span>
-                <button
-                  onClick={handleLogout}
-                  className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="hover:bg-blue-700 px-3 py-2 rounded"
-                >
-                  Login
-                </Link>
-                <Link to="/register">Register</Link>
-              </>
-            )}
-          </div>
+        {/* Mobile Toggle Button */}
+        <button className="mobile-menu-btn" onClick={() => setIsOpen(!isOpen)}>
+          <span className={`hamburger ${isOpen ? "open" : ""}`}></span>
+        </button>
+
+        {/* Links Section */}
+        <div className={`nav-menu ${isOpen ? "active" : ""}`}>
+          {user ? (
+            <>
+              <Link
+                to="/services"
+                className="nav-link"
+                onClick={() => setIsOpen(false)}
+              >
+                Services
+              </Link>
+              <Link
+                to="/dashboard"
+                className="nav-link"
+                onClick={() => setIsOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <span className="user-badge">
+                <span className="dot"></span> {user.role}
+              </span>
+              <button onClick={handleLogout} className="logout-btn">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="nav-link"
+                onClick={() => setIsOpen(false)}
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="nav-link nav-link-primary"
+                onClick={() => setIsOpen(false)}
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

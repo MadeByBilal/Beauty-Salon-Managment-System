@@ -1,0 +1,194 @@
+:root {
+  --nav-bg: rgba(255, 255, 255, 0.85); /* Translucent effect */
+  --accent: #c5a491;
+  --text-dark: #333333;
+  --text-light: #757575;
+  --border-subtle: rgba(0, 0, 0, 0.05);
+}
+
+.navbar {
+  height: 70px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(10px); /* Subtle glass effect */
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  font-family: "Inter", sans-serif;
+}
+
+.nav-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo */
+.nav-logo {
+  font-size: 1.5rem;
+  letter-spacing: 4px;
+  color: var(--text-dark);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* Navigation Links */
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: var(--accent);
+}
+
+/* Subtle Underline Hover */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 1.5px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* User Role Badge */
+.user-badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-light);
+  background: #f1f1f1;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+/* Buttons */
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  padding: 8px 18px;
+  border-radius: 4px;
+  color: var(--text-dark);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #fafafa;
+  border-color: var(--text-dark);
+}
+
+.nav-link-primary {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Mobile Toggle */
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.hamburger {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--text-dark);
+  position: relative;
+  transition: 0.3s;
+}
+
+.hamburger::before,
+.hamburger::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  background: var(--text-dark);
+  transition: 0.3s;
+}
+
+.hamburger::before {
+  top: -8px;
+}
+.hamburger::after {
+  top: 8px;
+}
+
+.hamburger.open {
+  background: transparent;
+}
+.hamburger.open::before {
+  transform: rotate(45deg);
+  top: 0;
+}
+.hamburger.open::after {
+  transform: rotate(-45deg);
+  top: 0;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: block;
+  }
+
+  .nav-menu {
+    position: fixed;
+    top: 70px;
+    left: -100%;
+    flex-direction: column;
+    background: white;
+    width: 100%;
+    height: calc(100vh - 70px);
+    padding: 40px;
+    gap: 40px;
+    transition: 0.4s ease-in-out;
+    text-align: center;
+    backdrop-filter: none;
+  }
+
+  .nav-menu.active {
+    left: 0;
+  }
+
+  .user-badge {
+    justify-content: center;
+  }
+}

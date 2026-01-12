@@ -1,0 +1,220 @@
+:root {
+  --aura-bg: #f9f7f5;
+  --white: #ffffff;
+  --accent: #c5a491;
+  --dark: #222222;
+  --border: #eeeae7;
+  --text-muted: #888888;
+  --soft-green: #eef5ee;
+  --dark-green: #4f7942;
+  --soft-amber: #fff9eb;
+  --dark-amber: #b8860b;
+}
+
+/* 1. WRAPPER & CONTAINER */
+.aura-page-wrapper {
+  background-color: var(--aura-bg);
+  min-height: 100vh;
+  padding: 80px 40px;
+  display: flex;
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+}
+
+.aura-main-container {
+  background-color: var(--white);
+  width: 100%;
+  max-width: 1200px;
+  padding: 60px;
+  border-radius: 24px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.03);
+}
+
+/* 2. HEADER */
+.aura-header {
+  margin-bottom: 50px;
+}
+
+.aura-header h1 {
+  font-size: 2.2rem;
+  letter-spacing: 6px;
+  font-weight: 800;
+  color: var(--dark);
+  text-transform: uppercase;
+}
+
+.title-tag {
+  color: var(--accent);
+  font-weight: 300;
+  margin-left: 10px;
+}
+
+.aura-header p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-top: 5px;
+}
+
+/* 3. CARD & CONTENT */
+.aura-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+}
+
+.card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.card-label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.schedule-stats {
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: var(--aura-bg);
+  padding: 8px 16px;
+  border-radius: 50px;
+  color: var(--dark);
+}
+
+/* 4. THE LEDGER (TABLE REPLACEMENT) */
+.aura-ledger {
+  width: 100%;
+}
+
+.ledger-head {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1.2fr;
+  padding: 0 20px 20px 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.ledger-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1.2fr;
+  padding: 25px 20px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.ledger-row:hover {
+  background-color: #fdfdfd;
+}
+
+.ledger-row.completed {
+  background-color: #fafafa;
+  opacity: 0.8;
+}
+
+/* COLUMN STYLING */
+.col-info .cust-name {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.col-info .serv-name {
+  font-size: 0.9rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.col-time .date {
+  display: block;
+  font-size: 1rem;
+  color: var(--dark);
+}
+
+.col-time .time {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* 5. PILLS & STATUS */
+.aura-pill {
+  font-size: 0.7rem;
+  padding: 6px 14px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.aura-pill.pending {
+  background: var(--soft-amber);
+  color: var(--dark-amber);
+}
+
+.aura-pill.completed {
+  background: var(--soft-green);
+  color: var(--dark-green);
+}
+
+/* 6. BUTTONS */
+.aura-btn-complete {
+  background-color: var(--dark);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.aura-btn-complete:hover {
+  background-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.completion-check {
+  color: var(--dark-green);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.aura-empty-state {
+  padding: 60px;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .ledger-head {
+    display: none;
+  }
+  .ledger-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 30px 20px;
+  }
+  .text-right {
+    text-align: left;
+  }
+  .aura-main-container {
+    padding: 30px;
+  }
+}

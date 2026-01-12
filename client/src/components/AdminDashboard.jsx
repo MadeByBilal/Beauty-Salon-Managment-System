@@ -16,6 +16,13 @@ const AdminDashboard = () => {
   const [editingId, setEditingId] = useState(null);
   const [message, setMessage] = useState("");
 
+  // Stats
+  const totalServices = services.length;
+  const totalAppointments = appointments.length;
+  const pendingAppointments = appointments.filter(
+    (app) => app.status === "pending" || app.status === "Pending"
+  ).length;
+
   const fetchServices = async () => {
     setLoading(true);
     setError("");
@@ -89,6 +96,8 @@ const AdminDashboard = () => {
     setPrice("");
     setDuration("");
     setEditingId(null);
+    setError("");
+    setMessage("");
   };
 
   const handleSubmit = async (e) => {
@@ -106,10 +115,10 @@ const AdminDashboard = () => {
     try {
       if (editingId) {
         await axios.put(`/services/${editingId}`, payload);
-        setMessage("Service updated");
+        setMessage("Service updated successfully");
       } else {
         await axios.post("/services", payload);
-        setMessage("Service created");
+        setMessage("Service created successfully");
       }
 
       await fetchServices();
@@ -133,7 +142,7 @@ const AdminDashboard = () => {
     setError("");
     try {
       await axios.delete(`/services/${id}`);
-      setMessage("Service deleted");
+      setMessage("Service deleted successfully");
       setServices((prev) => prev.filter((s) => s._id !== id));
     } catch (err) {
       setError(err.response?.data?.message || "Delete failed");
@@ -141,177 +150,332 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="admin-dashboard">
-      <h2 className="ad-title">Admin Dashboard</h2>
+    <div className="aura-admin-wrapper">
+      {/* MAIN CONTENT */}
+      <main className="aura-admin-main">
+        {/* HEADER */}
+        <header className="aura-admin-header">
+          <h1>Admin Dashboard</h1>
+          <p>Manage services, appointments, and staff accounts</p>
+        </header>
 
-      <section className="ad-section">
-        <h3>Manage Services</h3>
+        {/* QUICK STATS */}
+        <div className="aura-stats-grid">
+          <div className="stat-card">
+            <span className="stat-label">Total Services</span>
+            <span className="stat-value">{totalServices}</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-label">Total Appointments</span>
+            <span className="stat-value">{totalAppointments}</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-label">Pending Appointments</span>
+            <span className="stat-value">{pendingAppointments}</span>
+          </div>
+        </div>
 
-        <div className="ad-form-wrap">
-          <form className="ad-form" onSubmit={handleSubmit}>
-            {error && <div className="ad-error">{error}</div>}
-            {message && <div className="ad-message">{message}</div>}
-
-            <div className="field">
-              <label>Name</label>
-              <input value={name} onChange={(e) => setName(e.target.value)} />
-            </div>
-
-            <div className="field">
-              <label>Price</label>
-              <input
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </div>
-
-            <div className="field">
-              <label>Duration (minutes)</label>
-              <input
-                type="number"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-              />
-            </div>
-
-            <div className="actions">
-              <button type="submit" className="btn-primary">
-                {editingId ? "Update Service" : "Add Service"}
-              </button>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={resetForm}
+        {/* SERVICES SECTION */}
+        <section className="admin-section">
+          <h2 className="section-title">Manage Services</h2>
+          <div className="admin-two-col">
+            {/* FORM CARD */}
+            <div className="aura-card">
+              <h3
+                style={{
+                  marginBottom: "25px",
+                  fontSize: "1.1rem",
+                  fontWeight: "700",
+                  color: "var(--dark)",
+                }}
               >
-                Clear
+                {editingId ? "Edit Service" : "Add New Service"}
+              </h3>
+
+              {error && <div className="alert error">{error}</div>}
+              {message && <div className="alert success">{message}</div>}
+
+              <form onSubmit={handleSubmit} className="aura-admin-form">
+                <div className="input-group">
+                  <label>Service Name</label>
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g., Swedish Massage"
+                  />
+                </div>
+
+                <div className="input-row">
+                  <div className="input-group">
+                    <label>Price ($)</label>
+                    <input
+                      type="number"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="e.g., 120"
+                    />
+                  </div>
+                  <div className="input-group">
+                    <label>Duration (min)</label>
+                    <input
+                      type="number"
+                      value={duration}
+                      onChange={(e) => setDuration(e.target.value)}
+                      placeholder="e.g., 60"
+                    />
+                  </div>
+                </div>
+
+                <div
+                  style={{ display: "flex", gap: "15px", marginTop: "10px" }}
+                >
+                  <button type="submit" className="btn-primary">
+                    {editingId ? "Update Service" : "Create Service"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="btn-ghost"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* SERVICES LIST */}
+            <div className="aura-card">
+              <h3
+                style={{
+                  marginBottom: "25px",
+                  fontSize: "1.1rem",
+                  fontWeight: "700",
+                  color: "var(--dark)",
+                }}
+              >
+                All Services ({services.length})
+              </h3>
+
+              {loading ? (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "var(--text-gray)",
+                  }}
+                >
+                  Loading services...
+                </div>
+              ) : services.length === 0 ? (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "var(--text-gray)",
+                  }}
+                >
+                  No services yet. Add your first service!
+                </div>
+              ) : (
+                <div className="aura-table-wrapper">
+                  <table className="aura-admin-table">
+                    <thead>
+                      <tr>
+                        <th>Service</th>
+                        <th>Price</th>
+                        <th>Duration</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {services.map((svc) => (
+                        <tr key={svc._id}>
+                          <td style={{ fontWeight: "600" }}>{svc.name}</td>
+                          <td>${svc.price}</td>
+                          <td>{svc.duration} min</td>
+                          <td>
+                            <div className="action-buttons">
+                              <button
+                                onClick={() => handleEdit(svc)}
+                                className="text-btn"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDelete(svc._id)}
+                                className="btn-danger"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* APPOINTMENTS SECTION */}
+        <section className="admin-section">
+          <h2 className="section-title">Appointments</h2>
+          <div className="aura-card">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "25px",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "1.1rem",
+                  margin: 0,
+                  fontWeight: "700",
+                  color: "var(--dark)",
+                }}
+              >
+                All Appointments ({appointments.length})
+              </h3>
+              <button className="btn-ghost" onClick={fetchAppointments}>
+                Refresh
               </button>
             </div>
-          </form>
-        </div>
 
-        <div className="ad-list">
-          <h4>All Services</h4>
-          {loading ? (
-            <div>Loading...</div>
-          ) : services.length === 0 ? (
-            <div>No services yet</div>
-          ) : (
-            <table className="services-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Price</th>
-                  <th>Duration</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {services.map((svc) => (
-                  <tr key={svc._id}>
-                    <td>{svc.name}</td>
-                    <td>{svc.price}</td>
-                    <td>{svc.duration} min</td>
-                    <td className="row-actions">
-                      <button
-                        onClick={() => handleEdit(svc)}
-                        className="btn-sm"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(svc._id)}
-                        className="btn-sm btn-danger"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </section>
+            {appointments.length === 0 ? (
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "40px",
+                  color: "var(--text-gray)",
+                }}
+              >
+                No appointments found
+              </div>
+            ) : (
+              <div className="aura-table-wrapper">
+                <table className="aura-admin-table">
+                  <thead>
+                    <tr>
+                      <th>Service</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {appointments.map((app) => (
+                      <tr key={app._id}>
+                        <td>{getServiceName(app.serviceId)}</td>
+                        <td>{app.date}</td>
+                        <td>{app.time}</td>
+                        <td>
+                          <span
+                            className={`aura-pill ${app.status?.toLowerCase()}`}
+                          >
+                            {app.status || "Pending"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </section>
 
-      {/* Appointments Section */}
-      <section className="ad-section">
-        <h3>All Appointments (Pending & Completed)</h3>
-        <div className="ad-list">
-          {appointments.length === 0 ? (
-            <div>No appointments found</div>
-          ) : (
-            <table className="services-table">
-              <thead>
-                <tr>
-                  <th>Service</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {appointments.map((app) => (
-                  <tr key={app._id}>
-                    <td>{getServiceName(app.serviceId)}</td>
-                    <td>{app.date}</td>
-                    <td>{app.time}</td>
-                    <td>
-                      <span
-                        className={
-                          app.status === "completed"
-                            ? "status-completed"
-                            : "status-pending"
-                        }
-                      >
-                        {app.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </section>
+        {/* STAFF SECTION */}
+        <section className="admin-section">
+          <h2 className="section-title">Staff Management</h2>
+          <div className="aura-card">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "25px",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "1.1rem",
+                  margin: 0,
+                  fontWeight: "700",
+                  color: "var(--dark)",
+                }}
+              >
+                Staff Accounts ({staffUsers.length})
+              </h3>
+              <button className="btn-ghost" onClick={fetchStaffUsers}>
+                Refresh
+              </button>
+            </div>
 
-      {/* Staff Users Section */}
-      <section className="ad-section">
-        <h3>Staff Accounts</h3>
-        <div className="ad-list">
-          {staffUsers.length === 0 ? (
-            <div>No staff users found</div>
-          ) : (
-            <table className="services-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {staffUsers.map((staff) => (
-                  <tr key={staff._id}>
-                    <td>{staff.name}</td>
-                    <td>{staff.email}</td>
-                    <td>{staff.role}</td>
-                    <td className="row-actions">
-                      <button
-                        onClick={() => handleDeleteStaff(staff._id)}
-                        className="btn-sm btn-danger"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </section>
+            {staffUsers.length === 0 ? (
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "40px",
+                  color: "var(--text-gray)",
+                }}
+              >
+                No staff accounts found
+              </div>
+            ) : (
+              <div className="aura-table-wrapper">
+                <table className="aura-admin-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {staffUsers.map((staff) => (
+                      <tr key={staff._id}>
+                        <td style={{ fontWeight: "600" }}>{staff.name}</td>
+                        <td>{staff.email}</td>
+                        <td>
+                          <span
+                            className="aura-pill"
+                            style={{
+                              background:
+                                "linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)",
+                              color: "#1B5E20",
+                              border: "1px solid rgba(76, 175, 80, 0.3)",
+                            }}
+                          >
+                            {staff.role}
+                          </span>
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => handleDeleteStaff(staff._id)}
+                            className="btn-danger"
+                            style={{
+                              padding: "10px 20px",
+                              fontSize: "0.85rem",
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
     </div>
   );
 };

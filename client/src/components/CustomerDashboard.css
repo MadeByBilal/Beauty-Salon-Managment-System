@@ -1,0 +1,353 @@
+:root {
+  --aura-bg: #f5f2f0;
+  --aura-white: #ffffff;
+  --aura-nude: #c5a491;
+  --aura-charcoal: #222222;
+  --aura-border: #e8e4e1;
+  --aura-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --aura-green: #4f7942;
+  --aura-amber: #b8860b;
+  --aura-radius: 6px; /* Added radius variable */
+  --aura-radius-sm: 4px; /* Small radius */
+}
+
+/* 1. WRAPPER & MAIN CONTAINER */
+.aura-page-wrapper {
+  background-color: var(--aura-bg);
+  min-height: 100vh;
+  padding: 60px 20px;
+  display: flex;
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+}
+
+.aura-main-container {
+  background-color: var(--aura-white);
+  width: 100%;
+  max-width: 1300px;
+  padding: 40px;
+  border-radius: var(--aura-radius);
+  border: 1px solid var(--aura-border);
+  box-shadow: var(--aura-shadow);
+}
+
+/* 2. HEADER */
+.aura-header {
+  margin-bottom: 40px;
+  border-bottom: 2px solid var(--aura-charcoal);
+  padding-bottom: 20px;
+}
+
+.aura-header h1 {
+  font-size: 1.5rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--aura-charcoal);
+  margin-bottom: 8px;
+}
+
+.title-divider {
+  color: var(--aura-nude);
+  margin: 0 10px;
+}
+
+.aura-header p {
+  font-size: 0.9rem;
+  color: #666;
+  letter-spacing: 1px;
+}
+
+/* 3. GRID & CARDS */
+.aura-dashboard-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 40px;
+}
+
+.aura-card {
+  background: var(--aura-white);
+  padding: 28px;
+  margin-bottom: 28px;
+  border: 1px solid var(--aura-border);
+  border-radius: var(--aura-radius);
+  position: relative;
+}
+
+.sharp-shadow {
+  box-shadow: 6px 6px 0px rgba(197, 164, 145, 0.08);
+}
+
+.card-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 22px;
+  color: var(--aura-nude);
+  border-left: 3px solid var(--aura-nude);
+  padding-left: 12px;
+}
+
+/* 4. FORM & INPUTS */
+.aura-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.aura-input-group label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.aura-form input,
+.aura-form select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--aura-border);
+  border-radius: var(--aura-radius-sm);
+  font-size: 0.9rem;
+  background: #fafafa;
+  transition: border-color 0.2s;
+}
+
+.aura-form input:focus,
+.aura-form select:focus {
+  outline: none;
+  border-color: var(--aura-nude);
+  background: white;
+}
+
+.aura-input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.aura-btn-primary {
+  background: var(--aura-charcoal);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: var(--aura-radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  font-size: 0.85rem;
+}
+
+.aura-btn-primary:hover {
+  background: var(--aura-nude);
+  transform: translateY(-1px);
+}
+
+/* 5. HISTORY SECTION */
+.aura-history-table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-header {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr;
+  padding: 14px;
+  background: #fcfcfc;
+  border: 1px solid var(--aura-border);
+  border-radius: var(--aura-radius-sm) var(--aura-radius-sm) 0 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.history-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr;
+  padding: 18px 14px;
+  border-bottom: 1px solid var(--aura-border);
+  align-items: center;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.history-row:last-child {
+  border-bottom: none;
+  border-radius: 0 0 var(--aura-radius-sm) var(--aura-radius-sm);
+}
+
+.history-row:hover {
+  background: #f9f7f5;
+}
+
+.hist-status {
+  color: var(--aura-green);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+/* 6. APPOINTMENT ROWS */
+.aura-appointment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px;
+  border: 1px solid var(--aura-border);
+  border-radius: var(--aura-radius-sm);
+  margin-bottom: 12px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.aura-appointment-row:hover {
+  transform: translateY(-2px);
+  border-color: var(--aura-nude);
+}
+
+.row-main h4 {
+  margin: 8px 0 4px;
+  font-size: 1rem;
+}
+
+.row-main p {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.aura-pill {
+  font-size: 0.65rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  font-weight: 800;
+  margin-bottom: 8px;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+.aura-pill.pending {
+  background: var(--aura-amber);
+  color: white;
+}
+
+.aura-pill.confirmed {
+  background: var(--aura-green);
+  color: white;
+}
+
+.aura-btn-outline {
+  background: none;
+  border: 1px solid var(--aura-charcoal);
+  border-radius: var(--aura-radius-sm);
+  padding: 8px 16px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.aura-btn-outline:hover {
+  background: var(--aura-charcoal);
+  color: white;
+}
+
+/* MENU LIST */
+.aura-menu-item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--aura-border);
+  transition: padding 0.2s;
+}
+
+.aura-menu-item:hover {
+  padding-left: 4px;
+}
+
+.aura-menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  align-items: center;
+}
+
+.menu-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.menu-price {
+  color: var(--aura-nude);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.menu-duration {
+  font-size: 0.8rem;
+  color: #888;
+  font-style: italic;
+}
+
+/* UTILITY */
+.aura-empty-msg {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 1100px) {
+  .aura-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aura-main-container {
+    padding: 30px;
+  }
+
+  .aura-card {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .aura-page-wrapper {
+    padding: 40px 15px;
+  }
+
+  .aura-main-container {
+    padding: 20px;
+  }
+
+  .aura-input-row {
+    grid-template-columns: 1fr;
+  }
+
+  .history-header,
+  .history-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .aura-appointment-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .aura-btn-outline {
+    align-self: flex-end;
+  }
+}
+
+
+

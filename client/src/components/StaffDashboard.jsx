@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import "./StaffDashboard.css";
 
 const StaffDashboard = () => {
   const [appointments, setAppointments] = useState([]);
@@ -13,7 +14,7 @@ const StaffDashboard = () => {
   const fetchAppointments = async () => {
     try {
       const response = await axios.get("/appointments/staff");
-      setAppointments(response.data);
+      setAppointments(response.data || []);
     } catch (err) {
       console.error("Failed to fetch appointments:", err);
     }
@@ -22,7 +23,7 @@ const StaffDashboard = () => {
   const fetchServices = async () => {
     try {
       const response = await axios.get("/services");
-      setServices(response.data);
+      setServices(response.data || []);
     } catch (err) {
       console.error("Failed to fetch services:", err);
     }
@@ -43,71 +44,84 @@ const StaffDashboard = () => {
   };
 
   return (
-    <div className="">
-      <h2 className="">Staff Dashboard</h2>
+    <div className="aura-page-wrapper">
+      <div className="aura-main-container">
+        <header className="aura-header">
+          <h1>
+            AURA <span className="title-tag">Staff</span>
+          </h1>
+          <p>Manage your daily treatments and guest experiences.</p>
+        </header>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Service
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Time
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {appointments.map((appointment) => (
-                <tr key={appointment._id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getServiceName(appointment.serviceId)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {appointment.date}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {appointment.time}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        appointment.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {appointment.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {appointment.status === "pending" && (
-                      <button
-                        onClick={() =>
-                          handleCompleteAppointment(appointment._id)
-                        }
-                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
-                      >
-                        Mark Complete
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <section className="aura-dashboard-content">
+          <div className="aura-card shadow-touch">
+            <div className="card-header-flex">
+              <h3 className="card-label">Daily Schedule</h3>
+              <div className="schedule-stats">
+                {appointments.filter((a) => a.status === "pending").length}{" "}
+                Pending Tasks
+              </div>
+            </div>
+
+            <div className="aura-ledger">
+              {/* Header for Desktop */}
+              <div className="ledger-head">
+                <span>Customer & Service</span>
+                <span>Scheduled Time</span>
+                <span>Status</span>
+                <span className="text-right">Actions</span>
+              </div>
+
+              {appointments.length === 0 ? (
+                <div className="aura-empty-state">
+                  No appointments assigned to you today.
+                </div>
+              ) : (
+                appointments.map((appointment) => (
+                  <div
+                    key={appointment._id}
+                    className={`ledger-row ${appointment.status}`}
+                  >
+                    <div className="col-info">
+                      <span className="cust-name">
+                        {appointment.customerName || "Valued Guest"}
+                      </span>
+                      <span className="serv-name">
+                        {getServiceName(appointment.serviceId)}
+                      </span>
+                    </div>
+
+                    <div className="col-time">
+                      <span className="date">{appointment.date}</span>
+                      <span className="time">{appointment.time}</span>
+                    </div>
+
+                    <div className="col-status">
+                      <span className={`aura-pill ${appointment.status}`}>
+                        {appointment.status}
+                      </span>
+                    </div>
+
+                    <div className="col-actions text-right">
+                      {appointment.status === "pending" ? (
+                        <button
+                          className="aura-btn-complete"
+                          onClick={() =>
+                            handleCompleteAppointment(appointment._id)
+                          }
+                        >
+                          Mark Complete
+                        </button>
+                      ) : (
+                        <span className="completion-check">✓ Finished</span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
