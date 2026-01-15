@@ -8,12 +8,15 @@ const Login = ({ login }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      const response = await axios.post("/auth/login", { email, password });
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
+        email,
+        password,
+      });
       login(response.data.token, response.data.role);
       navigate("/dashboard");
     } catch (err) {

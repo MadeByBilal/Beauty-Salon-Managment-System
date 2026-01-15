@@ -9,7 +9,9 @@ const CustomerDashboard = () => {
   const [serviceId, setServiceId] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [loadingCancelId, setLoadingCancelId] = useState(null);
+
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
+  console.log("BACKENDURL", API_URL);
 
   useEffect(() => {
     fetchServices();
@@ -19,7 +21,7 @@ const CustomerDashboard = () => {
 
   const fetchAppointments = async () => {
     try {
-      const { data } = await axios.get("/appointments/my");
+      const { data } = await axios.get(`${API_URL}/api/appointments/my`);
       setAppointments(data || []);
     } catch (err) {
       if (err.response?.status !== 401) console.error("Error:", err);
@@ -29,7 +31,9 @@ const CustomerDashboard = () => {
 
   const fetchCompletedAppointments = async () => {
     try {
-      const { data } = await axios.get("/appointments/my/completed");
+      const { data } = await axios.get(
+        `${API_URL}/api/appointments/my/completed`
+      );
       setCompletedAppointments(Array.isArray(data) ? data : []);
     } catch (err) {
       if (err.response?.status !== 401) console.error("Error:", err);
@@ -39,7 +43,7 @@ const CustomerDashboard = () => {
 
   const fetchServices = async () => {
     try {
-      const { data } = await axios.get("/services");
+      const { data } = await axios.get(`${API_URL}/api/services`);
       setServices(data || []);
     } catch (err) {
       if (err.response?.status !== 401) console.error("Error:", err);
@@ -50,7 +54,11 @@ const CustomerDashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/appointments", { serviceId, date, time });
+      await axios.post(`${API_URL}/api/appointments`, {
+        serviceId,
+        date,
+        time,
+      });
       setServiceId("");
       setDate("");
       setTime("");
@@ -61,35 +69,73 @@ const CustomerDashboard = () => {
     }
   };
 
-  const handleCancelAppointment = async (appointmentId) => {
-    if (!window.confirm("Are you sure you want to cancel this appointment?")) {
-      return;
-    }
-
-    try {
-      setLoadingCancelId(appointmentId);
-      await axios.delete(`/appointments/${appointmentId}/cancel`);
-
-      // Remove the appointment from the UI immediately
-      setAppointments((prev) => prev.filter((a) => a._id !== appointmentId));
-
-      // Show success message
-      alert("Appointment cancelled successfully.");
-    } catch (err) {
-      alert(
-        err.response?.data?.message ||
-          "Failed to cancel appointment. Please try again."
-      );
-    } finally {
-      setLoadingCancelId(null);
-    }
-  };
-
   const getServiceName = (id) => {
     const s = services.find((srv) => srv._id?.toString() === id?.toString());
     return s?.name || "Premium Treatment";
   };
 
+  const formatDateTime = (dateStr, timeStr) => {
+    try {
+      const date = new Date(dateStr);
+      const days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+
+      const dayName = days[date.getDay()];
+      const monthName = months[date.getMonth()];
+      const day = date.getDate();
+      const year = date.getFullYear();
+
+      // Format time as HH:MM
+      const [hours, minutes] = timeStr.split(":");
+      const formattedTime = `${hours}:${minutes}`;
+
+      return `${dayName} ${monthName} ${day}, ${year} at ${formattedTime}`;
+    } catch (err) {
+      return `${dateStr} at ${timeStr}`;
+    }
+  };
+
+  // Add this function to your CustomerDashboard component
+  const handleCancelAppointment = async (appointmentId) => {
+    try {
+      console.log("Cancelling appointment:", appointmentId);
+      const response = await axios.put(
+        `${API_URL}/api/appointments/${appointmentId}/cancel`
+      );
+      console.log("Cancel response:", response.data);
+
+      // Refresh both appointment lists
+      fetchAppointments();
+      fetchCompletedAppointments();
+
+      alert("Appointment cancelled successfully.");
+    } catch (err) {
+      console.error("Error in handleCancelAppointment:", err);
+      console.error("Error response:", err.response?.data);
+      alert(err.response?.data?.message || "Error cancelling appointment");
+    }
+  };
   return (
     <div className="aura-page-wrapper">
       <div className="aura-main-container">
@@ -167,7 +213,7 @@ const CustomerDashboard = () => {
             </section>
           </aside>
 
-          {/* CONTENT: APPOINTMENTS & HISTORY */}
+          {/* CONTENT: APPOINTMENTS */}
           <main className="aura-content">
             <section className="aura-card sharp-shadow">
               <h3 className="card-title">Upcoming Appointments</h3>
@@ -182,16 +228,13 @@ const CustomerDashboard = () => {
                           {a.status}
                         </span>
                         <h4>{getServiceName(a.serviceId)}</h4>
-                        <p>
-                          {a.date} at {a.time}
-                        </p>
+                        <p>{formatDateTime(a.date, a.time)}</p>
                       </div>
                       <button
-                        className="aura-btn-outline"
                         onClick={() => handleCancelAppointment(a._id)}
-                        disabled={loadingCancelId === a._id}
+                        className="aura-btn-outline"
                       >
-                        {loadingCancelId === a._id ? "Cancelling..." : "Cancel"}
+                        Cancel
                       </button>
                     </div>
                   ))}
@@ -219,9 +262,16 @@ const CustomerDashboard = () => {
                         {getServiceName(a.serviceId)}
                       </span>
                       <span className="hist-date">
-                        {a.date} • {a.time}
+                        {formatDateTime(a.date, a.time)}
                       </span>
-                      <span className="hist-status">Completed</span>
+                      <span
+                        className="hist-status"
+                        style={{
+                          color: a.status === "cancelled" ? "red" : "green",
+                        }}
+                      >
+                        {a.status === "cancelled" ? "Cancelled" : "Completed"}
+                      </span>
                     </div>
                   ))
                 )}

@@ -23,11 +23,13 @@ const AdminDashboard = () => {
     (app) => app.status === "pending" || app.status === "Pending"
   ).length;
 
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
+
   const fetchServices = async () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get("/services");
+      const res = await axios.get(`${API_URL}/api/services`);
       setServices(res.data || []);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load services");
@@ -38,30 +40,26 @@ const AdminDashboard = () => {
 
   const fetchAppointments = async () => {
     try {
-      // Fetch pending appointments
-      const pendingRes = await axios.get("/appointments/my");
+      const pendingRes = await axios.get(`${API_URL}/api/appointments/my`);
       const pendingAppointments = pendingRes.data || [];
 
-      // Fetch completed appointments
-      const completedRes = await axios.get("/appointments/my/completed");
+      const completedRes = await axios.get(
+        `${API_URL}/api/appointments/my/completed`
+      );
       const completedAppointments = completedRes.data || [];
 
-      // Combine both arrays
       const allAppointments = pendingAppointments.concat(completedAppointments);
-
       setAppointments(allAppointments);
     } catch (err) {
-      console.error("Failed to fetch appointments:", err);
       setAppointments([]);
     }
   };
 
   const fetchStaffUsers = async () => {
     try {
-      const res = await axios.get("/auth/staff");
+      const res = await axios.get(`${API_URL}/api/auth/staff`);
       setStaffUsers(res.data || []);
     } catch (err) {
-      console.error("Failed to fetch staff users:", err);
       setStaffUsers([]);
     }
   };
@@ -70,7 +68,7 @@ const AdminDashboard = () => {
     if (!confirm("Are you sure you want to delete this staff member?")) return;
     setError("");
     try {
-      await axios.delete(`/auth/staff/${id}`);
+      await axios.delete(`${API_URL}/api/auth/staff/${id}`);
       setMessage("Staff member deleted successfully");
       setStaffUsers((prev) => prev.filter((staff) => staff._id !== id));
     } catch (err) {
@@ -83,6 +81,50 @@ const AdminDashboard = () => {
       (s) => s._id?.toString() === serviceId?.toString()
     );
     return service ? service.name : "Unknown Service";
+  };
+
+  const formatDateTime = (dateStr, timeStr) => {
+    try {
+      const date = new Date(dateStr);
+      const days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+
+      const dayName = days[date.getDay()];
+      const monthName = months[date.getMonth()];
+      const day = date.getDate();
+      const year = date.getFullYear();
+
+      const [hours, minutes] = timeStr.split(":");
+      const hour = parseInt(hours);
+      const period = hour >= 12 ? "PM" : "AM";
+      const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+      const formattedTime = `${displayHour}:${minutes} ${period}`;
+
+      return `${dayName} ${monthName} ${day}, ${year} at ${formattedTime}`;
+    } catch (err) {
+      return `${dateStr} at ${timeStr}`;
+    }
   };
 
   useEffect(() => {
@@ -114,10 +156,10 @@ const AdminDashboard = () => {
 
     try {
       if (editingId) {
-        await axios.put(`/services/${editingId}`, payload);
+        await axios.put(`${API_URL}/api/services/${editingId}`, payload);
         setMessage("Service updated successfully");
       } else {
-        await axios.post("/services", payload);
+        await axios.post(`${API_URL}/services`, payload);
         setMessage("Service created successfully");
       }
 
@@ -141,7 +183,7 @@ const AdminDashboard = () => {
     if (!confirm("Delete this service?")) return;
     setError("");
     try {
-      await axios.delete(`/services/${id}`);
+      await axios.delete(`${API_URL}/services/${id}`);
       setMessage("Service deleted successfully");
       setServices((prev) => prev.filter((s) => s._id !== id));
     } catch (err) {
@@ -151,15 +193,12 @@ const AdminDashboard = () => {
 
   return (
     <div className="aura-admin-wrapper">
-      {/* MAIN CONTENT */}
       <main className="aura-admin-main">
-        {/* HEADER */}
         <header className="aura-admin-header">
           <h1>Admin Dashboard</h1>
           <p>Manage services, appointments, and staff accounts</p>
         </header>
 
-        {/* QUICK STATS */}
         <div className="aura-stats-grid">
           <div className="stat-card">
             <span className="stat-label">Total Services</span>
@@ -175,11 +214,9 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* SERVICES SECTION */}
         <section className="admin-section">
           <h2 className="section-title">Manage Services</h2>
           <div className="admin-two-col">
-            {/* FORM CARD */}
             <div className="aura-card">
               <h3
                 style={{
@@ -243,7 +280,6 @@ const AdminDashboard = () => {
               </form>
             </div>
 
-            {/* SERVICES LIST */}
             <div className="aura-card">
               <h3
                 style={{
@@ -319,7 +355,6 @@ const AdminDashboard = () => {
           </div>
         </section>
 
-        {/* APPOINTMENTS SECTION */}
         <section className="admin-section">
           <h2 className="section-title">Appointments</h2>
           <div className="aura-card">
@@ -362,8 +397,7 @@ const AdminDashboard = () => {
                   <thead>
                     <tr>
                       <th>Service</th>
-                      <th>Date</th>
-                      <th>Time</th>
+                      <th>Date & Time</th>
                       <th>Status</th>
                     </tr>
                   </thead>
@@ -371,8 +405,7 @@ const AdminDashboard = () => {
                     {appointments.map((app) => (
                       <tr key={app._id}>
                         <td>{getServiceName(app.serviceId)}</td>
-                        <td>{app.date}</td>
-                        <td>{app.time}</td>
+                        <td>{formatDateTime(app.date, app.time)}</td>
                         <td>
                           <span
                             className={`aura-pill ${app.status?.toLowerCase()}`}
@@ -389,7 +422,6 @@ const AdminDashboard = () => {
           </div>
         </section>
 
-        {/* STAFF SECTION */}
         <section className="admin-section">
           <h2 className="section-title">Staff Management</h2>
           <div className="aura-card">

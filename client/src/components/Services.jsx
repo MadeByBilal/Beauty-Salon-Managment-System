@@ -7,13 +7,14 @@ const Services = ({ user }) => {
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
 
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
   useEffect(() => {
     fetchServices();
   }, []);
 
   const fetchServices = async () => {
     try {
-      const response = await axios.get("/services");
+      const response = await axios.get(`${API_URL}/api/services`);
       setServices(response.data);
     } catch (err) {
       console.error("Failed to fetch services:", err);

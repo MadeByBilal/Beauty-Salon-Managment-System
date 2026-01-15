@@ -15,7 +15,7 @@ const Register = ({ login }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -30,8 +30,8 @@ const Register = ({ login }) => {
     }
 
     try {
-      await axios.post("/auth/register", formData);
-      const response = await axios.post("/auth/login", {
+      await axios.post(`${API_URL}/api/auth/register`, formData);
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
         email: formData.email,
         password: formData.password,
       });

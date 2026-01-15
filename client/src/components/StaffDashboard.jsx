@@ -6,6 +6,7 @@ const StaffDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [services, setServices] = useState([]);
 
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
   useEffect(() => {
     fetchAppointments();
     fetchServices();
@@ -13,7 +14,7 @@ const StaffDashboard = () => {
 
   const fetchAppointments = async () => {
     try {
-      const response = await axios.get("/appointments/staff");
+      const response = await axios.get(`${API_URL}/api/appointments/staff`);
       setAppointments(response.data || []);
     } catch (err) {
       console.error("Failed to fetch appointments:", err);
@@ -22,7 +23,7 @@ const StaffDashboard = () => {
 
   const fetchServices = async () => {
     try {
-      const response = await axios.get("/services");
+      const response = await axios.get(`${API_URL}/api/services`);
       setServices(response.data || []);
     } catch (err) {
       console.error("Failed to fetch services:", err);
@@ -31,7 +32,9 @@ const StaffDashboard = () => {
 
   const handleCompleteAppointment = async (id) => {
     try {
-      await axios.put(`/appointments/${id}/status`, { status: "completed" });
+      await axios.put(`${API_URL}/api/appointments/${id}/status`, {
+        status: "completed",
+      });
       fetchAppointments();
     } catch (err) {
       alert(err.response?.data?.message || "Failed to update appointment");
@@ -41,6 +44,50 @@ const StaffDashboard = () => {
   const getServiceName = (serviceId) => {
     const service = services.find((s) => s._id === serviceId);
     return service ? service.name : "Unknown Service";
+  };
+
+  const formatDateTime = (dateStr, timeStr) => {
+    try {
+      const date = new Date(dateStr);
+      const days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+
+      const dayName = days[date.getDay()];
+      const monthName = months[date.getMonth()];
+      const day = date.getDate();
+      const year = date.getFullYear();
+
+      const [hours, minutes] = timeStr.split(":");
+      const hour = parseInt(hours);
+      const period = hour >= 12 ? "PM" : "AM";
+      const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+      const formattedTime = `${displayHour}:${minutes} ${period}`;
+
+      return `${dayName} ${monthName} ${day}, ${year} at ${formattedTime}`;
+    } catch (err) {
+      return `${dateStr} at ${timeStr}`;
+    }
   };
 
   return (
@@ -92,8 +139,9 @@ const StaffDashboard = () => {
                     </div>
 
                     <div className="col-time">
-                      <span className="date">{appointment.date}</span>
-                      <span className="time">{appointment.time}</span>
+                      <span className="scheduled-time">
+                        {formatDateTime(appointment.date, appointment.time)}
+                      </span>
                     </div>
 
                     <div className="col-status">

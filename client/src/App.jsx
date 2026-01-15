@@ -15,8 +15,6 @@ import Services from "./components/Services";
 import Navbar from "./components/Navbar";
 import "./App.css";
 
-axios.defaults.baseURL = "http://localhost:5000/api"; //Global Url for all axios requests.
-
 function App() {
   const [user, setUser] = useState(null);
 

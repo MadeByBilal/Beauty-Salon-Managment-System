@@ -25,7 +25,7 @@ router.post("/", isAuth, async (req, res) => {
 // GET /appointments/my/completed - Must come before /my to avoid route conflict
 router.get("/my/completed", isAuth, async (req, res) => {
   try {
-    let query = { status: "completed" };
+    let query = { status: { $in: ["completed", "cancelled"] } };
 
     // If not admin, filter by userId
     if (req.user.role !== "admin") {
@@ -82,6 +82,37 @@ router.put("/:id/status", isAuth, isStaff, async (req, res) => {
   res.json(app);
 });
 
+// Cancel appointment (customer)
+router.put("/:id/cancel", isAuth, async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id);
 
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Check if user owns the appointment or is admin
+    if (
+      req.user.role !== "admin" &&
+      appointment.userId.toString() !== req.user.id
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to cancel this appointment" });
+    }
+
+    // Update status to cancelled
+    const updatedAppointment = await Appointment.findByIdAndUpdate(
+      req.params.id,
+      { status: "cancelled" },
+      { new: true }
+    );
+
+    res.json(updatedAppointment);
+  } catch (error) {
+    console.error("Error cancelling appointment:", error);
+    res.status(500).json({ message: "Error cancelling appointment" });
+  }
+});
 
 export default router;

@@ -186,6 +186,14 @@
 }
 
 .hist-status {
+  background-color: #a8cb9e;
+  width: 100px;
+  height: 30px;
+  border-radius: 30px;
+  display: flex;
+  text-align: center;
+  padding-top: 5px;
+  justify-content: center;
   color: var(--aura-green);
   font-weight: 600;
   font-size: 0.8rem;
@@ -348,6 +356,3 @@
     align-self: flex-end;
   }
 }
-
-
-
