@@ -10,7 +10,7 @@ import cors from "cors";
 
 dotenv.config();
 connectDB();
-
+const PORT = process.env.PORT;
 const app = express();
 app.use(express.json());
 app.use(
@@ -23,4 +23,4 @@ app.use("/api/auth", authRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/appointments", appointmentRoutes);
 
-app.listen(5000, () => console.log("Server running"));
+app.listen(PORT, () => console.log(`Server running ${PORT}`));
