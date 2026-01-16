@@ -1,17 +1,17 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import connectDB from "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
 import appointmentRoutes from "./routes/appointmentRoutes.js";
 
-import cors from "cors";
-
 dotenv.config();
-connectDB();
-const PORT = process.env.PORT;
+
 const app = express();
+
+// Middleware
 app.use(express.json());
 app.use(
   cors({
@@ -20,8 +20,26 @@ app.use(
   })
 );
 
+// Health route
+app.get("/", (req, res) => {
+  res.send("🔥 BSMS API is running");
+});
+
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/appointments", appointmentRoutes);
 
-app.listen(PORT, () => console.log(`Server running ${PORT}`));
+// Start server only after DB connects
+const startServer = async () => {
+  try {
+    await connectDB();
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  } catch (err) {
+    console.error("❌ Server failed to start:", err.message);
+    process.exit(1);
+  }
+};
+
+startServer();
