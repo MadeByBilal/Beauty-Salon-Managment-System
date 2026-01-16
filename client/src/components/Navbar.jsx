@@ -29,13 +29,7 @@ const Navbar = ({ user, logout }) => {
         <div className={`nav-menu ${isOpen ? "active" : ""}`}>
           {user ? (
             <>
-              <Link
-                to="/services"
-                className="nav-link"
-                onClick={() => setIsOpen(false)}
-              >
-                Services
-              </Link>
+              
               <Link
                 to="/dashboard"
                 className="nav-link"

@@ -29,14 +29,14 @@ function App() {
 
   const login = (token, role) => {
     const userData = { role };
-    localStorage.setItem("token", token);
+    localStorage.setItem("token", token); //storing the token on the browser local storage
     localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
+    setUser(userData); //storing the role of the user
     axios.defaults.headers.common["Authorization"] = token;
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("token"); //Removing the token on the browser local storage
     localStorage.removeItem("user");
     setUser(null);
     delete axios.defaults.headers.common["Authorization"];

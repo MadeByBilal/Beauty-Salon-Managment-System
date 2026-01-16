@@ -15,7 +15,8 @@ const Register = ({ login }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_BACKEND_URL;
+  //-------------------------------------------------------
+  const API_URL = import.meta.env.VITE_BACKEND_URL; //from env
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -26,17 +27,19 @@ const Register = ({ login }) => {
     setSuccess("");
 
     if (formData.password !== formData.confirmPassword) {
+      //confrim the both pass are correct
       return setError("Passwords do not match");
     }
 
     try {
       await axios.post(`${API_URL}/api/auth/register`, formData);
       const response = await axios.post(`${API_URL}/api/auth/login`, {
+        //with that also log the user
         email: formData.email,
-        password: formData.password,
+        password: formData.password,//login the user
       });
 
-      login(response.data.token, response.data.role);
+      login(response.data.token, response.data.role); //that keeps the user login and keep the user is the correct dashboard
       setSuccess("Account created! Welcome to Aura.");
       setTimeout(() => navigate("/dashboard"), 1500);
     } catch (err) {

@@ -17,7 +17,7 @@ const Login = ({ login }) => {
         email,
         password,
       });
-      login(response.data.token, response.data.role);
+      login(response.data.token, response.data.role);//server sends back token and role of the user
       navigate("/dashboard");
     } catch (err) {
       setError(
