@@ -8,6 +8,7 @@ const Login = ({ login }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  //Backend Url form env.
   const API_URL = import.meta.env.VITE_BACKEND_URL;
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +18,7 @@ const Login = ({ login }) => {
         email,
         password,
       });
-      login(response.data.token, response.data.role);//server sends back token and role of the user
+      login(response.data.token, response.data.role); //server sends back token and role of the user
       navigate("/dashboard");
     } catch (err) {
       setError(

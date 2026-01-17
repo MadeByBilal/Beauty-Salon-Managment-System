@@ -5,13 +5,13 @@ import "./StaffDashboard.css";
 const StaffDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [services, setServices] = useState([]);
-
+  //Backend url from the env.
   const API_URL = import.meta.env.VITE_BACKEND_URL;
   useEffect(() => {
     fetchAppointments();
     fetchServices();
   }, []);
-
+  //Fetching the appointments.
   const fetchAppointments = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/appointments/staff`);
@@ -20,7 +20,7 @@ const StaffDashboard = () => {
       console.error("Failed to fetch appointments:", err);
     }
   };
-
+  //Fetching services.
   const fetchServices = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/services`);
@@ -29,7 +29,7 @@ const StaffDashboard = () => {
       console.error("Failed to fetch services:", err);
     }
   };
-
+  //Updating service status.
   const handleCompleteAppointment = async (id) => {
     try {
       await axios.put(`${API_URL}/api/appointments/${id}/status`, {
@@ -40,12 +40,12 @@ const StaffDashboard = () => {
       alert(err.response?.data?.message || "Failed to update appointment");
     }
   };
-
+  //It finds the name of the services.
   const getServiceName = (serviceId) => {
     const service = services.find((s) => s._id === serviceId);
     return service ? service.name : "Unknown Service";
   };
-
+  //Simple date formating function.
   const formatDateTime = (dateStr, timeStr) => {
     try {
       const date = new Date(dateStr);

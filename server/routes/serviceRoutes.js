@@ -16,13 +16,13 @@ router.post("/", isAuth, isAdmin, async (req, res) => {
   res.json(service);
 });
 
-// Update service
+// Update service (admin)
 router.put("/:id", isAuth, isAdmin, async (req, res) => {
   const service = await Service.findByIdAndUpdate(req.params.id, req.body);
   res.json(service);
 });
 
-// Delete service
+// Delete service (admin)
 router.delete("/:id", isAuth, isAdmin, async (req, res) => {
   await Service.findByIdAndDelete(req.params.id);
   res.json({ message: "Deleted" });

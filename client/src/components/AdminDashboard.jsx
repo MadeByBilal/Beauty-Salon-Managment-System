@@ -48,7 +48,7 @@ const AdminDashboard = () => {
       );
       const completedAppointments = completedRes.data || [];
 
-      const allAppointments = pendingAppointments.concat(completedAppointments);
+      const allAppointments = pendingAppointments.concat(completedAppointments); // Combining two arrays.
       setAppointments(allAppointments);
     } catch (err) {
       setAppointments([]);
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
       setError("Please fill all fields");
       return;
     }
-
+    // Creating the data to send.
     const payload = { name, price: Number(price), duration: Number(duration) };
 
     try {

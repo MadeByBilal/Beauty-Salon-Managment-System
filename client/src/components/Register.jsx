@@ -16,7 +16,8 @@ const Register = ({ login }) => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   //-------------------------------------------------------
-  const API_URL = import.meta.env.VITE_BACKEND_URL; //from env
+  const API_URL = import.meta.env.VITE_BACKEND_URL; //Backend Url from env.
+  //It handle the changes in the from.
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -36,7 +37,7 @@ const Register = ({ login }) => {
       const response = await axios.post(`${API_URL}/api/auth/login`, {
         //with that also log the user
         email: formData.email,
-        password: formData.password,//login the user
+        password: formData.password, //login the user
       });
 
       login(response.data.token, response.data.role); //that keeps the user login and keep the user is the correct dashboard

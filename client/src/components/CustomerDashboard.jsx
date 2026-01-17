@@ -9,9 +9,8 @@ const CustomerDashboard = () => {
   const [serviceId, setServiceId] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-
+  //Backend Url from env.
   const API_URL = import.meta.env.VITE_BACKEND_URL;
-  console.log("BACKENDURL", API_URL);
 
   useEffect(() => {
     fetchServices();
@@ -21,6 +20,7 @@ const CustomerDashboard = () => {
 
   const fetchAppointments = async () => {
     try {
+      //my are the appointments that are pending.
       const { data } = await axios.get(`${API_URL}/api/appointments/my`);
       setAppointments(data || []);
     } catch (err) {
@@ -28,7 +28,7 @@ const CustomerDashboard = () => {
       setAppointments([]);
     }
   };
-
+  //my/complete are the appointment that are complete.
   const fetchCompletedAppointments = async () => {
     try {
       const { data } = await axios.get(
@@ -68,12 +68,12 @@ const CustomerDashboard = () => {
       alert(err.response?.data?.message || "Server error");
     }
   };
-
+  //Getting the service name by using its id.
   const getServiceName = (id) => {
     const s = services.find((srv) => srv._id?.toString() === id?.toString());
     return s?.name || "Premium Treatment";
   };
-
+  //formatDateTime  function.
   const formatDateTime = (dateStr, timeStr) => {
     try {
       const date = new Date(dateStr);
@@ -106,7 +106,6 @@ const CustomerDashboard = () => {
       const day = date.getDate();
       const year = date.getFullYear();
 
-      // Format time as HH:MM
       const [hours, minutes] = timeStr.split(":");
       const formattedTime = `${hours}:${minutes}`;
 
@@ -116,14 +115,12 @@ const CustomerDashboard = () => {
     }
   };
 
-  // Add this function to your CustomerDashboard component
+  // Cancel appointment function.
   const handleCancelAppointment = async (appointmentId) => {
     try {
-      console.log("Cancelling appointment:", appointmentId);
       const response = await axios.put(
         `${API_URL}/api/appointments/${appointmentId}/cancel`
       );
-      console.log("Cancel response:", response.data);
 
       // Refresh both appointment lists
       fetchAppointments();
@@ -131,8 +128,6 @@ const CustomerDashboard = () => {
 
       alert("Appointment cancelled successfully.");
     } catch (err) {
-      console.error("Error in handleCancelAppointment:", err);
-      console.error("Error response:", err.response?.data);
       alert(err.response?.data?.message || "Error cancelling appointment");
     }
   };
@@ -163,6 +158,7 @@ const CustomerDashboard = () => {
                   >
                     <option value="">Choose a treatment...</option>
                     {services.map((s) => (
+                      // here is the serviceid set in the variable
                       <option key={s._id} value={s._id}>
                         {s.name} — ${s.price}
                       </option>

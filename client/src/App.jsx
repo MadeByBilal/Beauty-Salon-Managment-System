@@ -23,20 +23,20 @@ function App() {
     const userData = localStorage.getItem("user");
     if (token && userData) {
       setUser(JSON.parse(userData));
-      axios.defaults.headers.common["Authorization"] = token;
+      axios.defaults.headers.common["Authorization"] = token; //This adds the token in to header of every request of the axois.
     }
   }, []);
 
   const login = (token, role) => {
     const userData = { role };
-    localStorage.setItem("token", token); //storing the token on the browser local storage
+    localStorage.setItem("token", token); //Storing the token on the browser local storage.
     localStorage.setItem("user", JSON.stringify(userData));
     setUser(userData); //storing the role of the user
     axios.defaults.headers.common["Authorization"] = token;
   };
 
   const logout = () => {
-    localStorage.removeItem("token"); //Removing the token on the browser local storage
+    localStorage.removeItem("token"); //Removing the token from browser local storage.
     localStorage.removeItem("user");
     setUser(null);
     delete axios.defaults.headers.common["Authorization"];
@@ -55,7 +55,7 @@ function App() {
             <Route
               path="/login"
               element={
-                !user ? <Login login={login} /> : <Navigate to="/dashboard" />
+                !user ? <Login login={login} /> : <Navigate to="/dashboard" /> //login function is pass as to provide the token and the role of the user.
               }
             />
             <Route
@@ -69,6 +69,7 @@ function App() {
               }
             />
             <Route path="/services" element={<Services user={user} />} />
+            //user have the info of the token and the role
             <Route
               path="/dashboard"
               element={
