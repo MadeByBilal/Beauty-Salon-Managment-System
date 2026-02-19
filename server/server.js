@@ -20,10 +20,6 @@ app.use(
   })
 );
 
-// Health route
-app.get("/", (req, res) => {
-  res.send("🔥 BSMS API is running");
-});
 
 // Routes
 app.use("/api/auth", authRoutes);
